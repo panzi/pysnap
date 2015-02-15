@@ -3,13 +3,14 @@
 """Basic Snapchat client
 
 Usage:
-  get_snaps.py -u <username> [-p <password> -q] <path>
+  get_snaps.py -u <username> [-p <password> -q] [-f <usernames>] <path>
 
 Options:
   -h --help                 Show usage
   -q --quiet                Suppress output
   -u --username=<username>  Username
   -p --password=<password>  Password (optional, will prompt if omitted)
+  -f --from=<usernames>     Only download snaps from these users
 
 """
 from __future__ import print_function
@@ -32,6 +33,9 @@ def main():
         password = getpass('Password:')
     else:
         password = arguments['--password']
+    from_users = arguments['--from']
+    if from_users is not None:
+        from_users = set(from_users.split(','))
     path = arguments['<path>']
 
     if not os.path.isdir(path):
@@ -44,11 +48,14 @@ def main():
         sys.exit(1)
 
     for snap in s.get_friend_stories():
+        if from_users and snap['username'] not in from_users:
+            continue
         filename = '{0}_{1}.{2}'.format(snap['sender'], snap['id'],
                                         get_file_extension(snap['media_type']))
         abspath = os.path.abspath(os.path.join(path, filename))
         if os.path.isfile(abspath):
             continue
+        print('downloading %s' % filename)
         data = s.get_story_blob(snap['media_id'],
                                 base64.b64decode(snap['media_key']),
                                 base64.b64decode(snap['media_iv']))
