@@ -50,8 +50,11 @@ def main():
     for snap in s.get_friend_stories():
         if from_users and snap['username'] not in from_users:
             continue
-        filename = '{0}_{1}.{2}'.format(snap['sender'], snap['id'],
-                                        get_file_extension(snap['media_type']))
+        if snap['zipped']:
+            ext = 'zip'
+        else:
+            ext = get_file_extension(snap['media_type'])
+        filename = '{0}_{1}.{2}'.format(snap['sender'], snap['id'], ext)
         abspath = os.path.abspath(os.path.join(path, filename))
         if os.path.isfile(abspath):
             continue
