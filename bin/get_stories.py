@@ -43,7 +43,7 @@ def main():
         sys.exit(1)
 
     s = Snapchat()
-    if not s.login(username, password).get('logged'):
+    if not s.login(username, password)['updates_response'].get('logged'):
         print('Invalid username or password')
         sys.exit(1)
 
